@@ -1,0 +1,269 @@
+# generado_en: 2026-10-20T00:07:04+00:00
+# proveedor: openai
+# modelo: gpt-4o-mini
+# modelo_supervisor: gpt-4o-mini
+# retriever_backend: pinecone
+# max_pasos: 6
+# max_reparaciones: 2
+# recursion_limit: 30
+# prompts: {'supervisor': 'supervisor-v2', 'investigador': 'investigador-v1', 'analista': 'analista-v1', 'sintesis': 'sintesis-v1'}
+# python: 3.12.10
+# langgraph: 1.2.16
+# langchain: 1.4.6
+
+=== E1 · Flujo completo: Investigador → Analista → Síntesis ===
+Usuario: "Un empleado lleva 12 años en TechCorp. Según la política de vacaciones, ¿cuántos días de vacaciones le corresponden por año y cuántos días suma en 3 años consecutivos manteniendo ese ritmo?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta el dato específico sobre los días de vacaciones que corresponden por año según la política de la empresa.
+      instrucción: "Buscar la política de vacaciones de TechCorp para determinar cuántos días de vacaciones le corresponden a un empleado por año. Devolver el número de días de vacaciones anuales y la fuente con cita textual."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): estado=completo, 3 hallazgo(s), confianza=1.00
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones anuales") → [Fuente: politica_teletrabajo.txt] Política de Teletrabajo - TechCorp El esquema estándar es de 3 días de trabajo remot…
+[3] validador ✔ investigador aprobado
+[4] supervisor decide → analista (llm)
+      razón: Ya están todos los números y falta un cálculo.
+      instrucción: "Calcular cuántos días de vacaciones le corresponden al empleado en 3 años consecutivos, usando el dato de 28 días por año (por tener más de 10 años de antigüedad). Devolver el total de días de vacaciones en 3 años."
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[5] analista (intento 1): 28 * 3 = 84 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[6] validador ✔ analista aprobado
+[7] supervisor decide → FINISH (llm)
+      razón: Se han respondido todas las partes de la pregunta, se ha validado la política de vacaciones y se ha realizado el cálculo correspondiente.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[8] sintesis: respuesta redactada
+Respuesta final: "Un empleado con más de 10 años de antigüedad en TechCorp tiene derecho a 28 días corridos de vacaciones por año. En 3 años, esto suma un total de: 28 días/año * 3 años = 84 días de vacaciones. Fuente: política de vacaciones de TechCorp. Advertencia: Este cálculo asume que el empleado mantiene el mismo ritmo de antigüedad y no hay cambios en la política de vacaciones."
+(COMPLETADO · 2 paso(s) de especialista · 8 nodos · 12.2 s · 7179 tokens)
+  ✔ estado_final == COMPLETADO
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ el supervisor delega primero al investigador y luego al analista
+  ✔ el investigador usó buscar_en_politicas_internas
+  ✔ el analista usó la calculadora
+  ✔ ambos artefactos fueron aprobados por el validador
+  ✔ la respuesta contiene 28 (por año) y 84 (en 3 años)
+
+=== E2 · Solo cómputo: el supervisor omite al investigador ===
+Usuario: "Un empleado va a cumplir 12 años en TechCorp. Tuvo 14 días de vacaciones los primeros 5 años, 21 los siguientes 5, y ahora tiene derecho a 28. ¿Cuántos días de vacaciones acumuló en total en esos 12 años?"
+[1] supervisor decide → analista (llm)
+      razón: Ya están todos los números disponibles y solo falta un cálculo.
+      instrucción: "Calcula el total de días de vacaciones acumulados por el empleado en 12 años. Usa los siguientes datos: 14 días (primeros 5 años), 21 días (siguientes 5 años), y 28 días (últimos 2 años). Devuelve el total acumulado."
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[2] analista (intento 1): 14*5 + 21*5 + 28*2 = 231 (confianza=1.00)
+      herramienta: calculadora(expresion="14*5 + 21*5 + 28*2") → Resultado: 231
+[3] validador ✔ analista aprobado
+[4] supervisor decide → FINISH (llm)
+      razón: Todos los cálculos están completos y validados. El analista ha realizado correctamente el cálculo de los días de vacaciones acumulados en 12 años.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[5] sintesis: respuesta redactada
+Respuesta final: "El empleado acumuló un total de 231 días de vacaciones en 12 años en TechCorp. Este cálculo se realizó considerando 14 días por los primeros 5 años, 21 días por los siguientes 5 años y 28 días por los últimos 2 años: 14 días * 5 años + 21 días * 5 años + 28 días * 2 años = 231 días. Fuente: Aportes validados por el analista. No se presentan advertencias ni supuestos adicionales."
+(COMPLETADO · 1 paso(s) de especialista · 5 nodos · 6.6 s · 3752 tokens)
+  ✔ estado_final == COMPLETADO
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ ruteo dinámico: va directo al analista, sin investigar
+  ✔ la respuesta contiene 231
+
+=== E3 · Solo investigación: el supervisor omite al analista ===
+Usuario: "¿Cuántos días de trabajo remoto y cuántos presenciales por semana tiene el esquema estándar de teletrabajo?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta información específica sobre el esquema de teletrabajo de la empresa, que no está presente en la pregunta.
+      instrucción: "Buscar datos sobre el esquema estándar de teletrabajo en las políticas internas de TechCorp, específicamente cuántos días de trabajo remoto y cuántos presenciales por semana están establecidos. Devolver hallazgos con fuente y cita textual."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): estado=completo, 2 hallazgo(s), confianza=1.00
+      herramienta: buscar_en_politicas_internas(pregunta="esquema estándar de teletrabajo días remotos y presenciales por semana") → [Fuente: politica_teletrabajo.txt] Política de Teletrabajo - TechCorp El esquema estándar es de 3 días de trabajo remot…
+[3] validador ✔ investigador aprobado
+[4] supervisor decide → FINISH (llm)
+      razón: Todos los datos han sido validados y se ha respondido a la pregunta sobre el esquema de teletrabajo.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[5] sintesis: respuesta redactada
+Respuesta final: "El esquema estándar de teletrabajo consiste en 3 días de trabajo remoto y 2 días presenciales por semana. Esta información proviene de la fuente "politica_teletrabajo.txt". No se presentan advertencias ni supuestos en esta respuesta."
+(COMPLETADO · 1 paso(s) de especialista · 5 nodos · 7.9 s · 4271 tokens)
+  ✔ estado_final == COMPLETADO
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ ruteo dinámico: solo investiga, sin analista
+  ✔ la respuesta contiene 3 días remotos y 2 presenciales
+
+=== E4 · Tres tramos de antigüedad en un solo cálculo ===
+Usuario: "Si en un mismo año tomaran vacaciones tres empleados con 3, 7 y 12 años de antigüedad, ¿cuántos días de vacaciones suman entre los tres?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta información sobre los días de vacaciones que corresponden a cada antigüedad en la política de TechCorp.
+      instrucción: "Investiga cuántos días de vacaciones corresponden a empleados con 3, 7 y 12 años de antigüedad en TechCorp. Devuelve los días de vacaciones para cada antigüedad con fuente y cita textual."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): estado=completo, 3 hallazgo(s), confianza=1.00
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones por antigüedad 3 años") → [Fuente: politica_vacaciones.txt] Política de Vacaciones - TechCorp Los empleados con menos de 5 años de antigüedad acc…
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones por antigüedad 7 años") → [Fuente: politica_vacaciones.txt] Política de Vacaciones - TechCorp Los empleados con menos de 5 años de antigüedad acc…
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones por antigüedad 12 años") → [Fuente: politica_vacaciones.txt] Política de Vacaciones - TechCorp Los empleados con menos de 5 años de antigüedad acc…
+[3] validador ✔ investigador aprobado
+[4] supervisor decide → analista (llm)
+      razón: Ya están todos los números disponibles y falta un cálculo.
+      instrucción: "Calcular la suma de días de vacaciones de tres empleados: 14 (3 años) + 21 (7 años) + 28 (12 años). Devolver el total de días de vacaciones."
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[5] analista (intento 1): 14 + 21 + 28 = 63 (confianza=1.00)
+      herramienta: calculadora(expresion="14 + 21 + 28") → Resultado: 63
+[6] validador ✔ analista aprobado
+[7] supervisor decide → FINISH (llm)
+      razón: Todos los datos han sido validados y se han realizado los cálculos necesarios. La suma de días de vacaciones es correcta y completa.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[8] sintesis: respuesta redactada
+Respuesta final: "Los tres empleados suman un total de 63 días de vacaciones. El cálculo es el siguiente: - Empleado con 3 años de antigüedad: 14 días - Empleado con 7 años de antigüedad: 21 días - Empleado con 12 años de antigüedad: 28 días Total: 14 + 21 + 28 = 63 días. Fuente de los datos: política de vacaciones de la empresa. No hay advertencias o supuestos relevantes en este cálculo."
+(COMPLETADO · 2 paso(s) de especialista · 8 nodos · 13.3 s · 7724 tokens)
+  ✔ estado_final == COMPLETADO
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ investigador → analista
+  ✔ el investigador respaldó los tres tramos (14, 21 y 28)
+  ✔ la respuesta contiene 63
+
+=== E5 · Reparación: el validador rechaza un cálculo inconsistente ===
+Usuario: "Un empleado lleva 12 años en TechCorp. Según la política de vacaciones, ¿cuántos días de vacaciones le corresponden por año y cuántos días suma en 3 años consecutivos manteniendo ese ritmo?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta el dato específico sobre los días de vacaciones que corresponden por año según la política de TechCorp.
+      instrucción: "Buscar la política de vacaciones de TechCorp para determinar cuántos días de vacaciones le corresponden a un empleado por año. Devolver el número de días de vacaciones por año y la fuente con cita textual."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): estado=completo, 3 hallazgo(s), confianza=1.00
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones por año") → [Fuente: politica_teletrabajo.txt] Política de Teletrabajo - TechCorp El esquema estándar es de 3 días de trabajo remot…
+[3] validador ✔ investigador aprobado
+[4] supervisor decide → analista (llm)
+      razón: Ya están todos los números y falta un cálculo.
+      instrucción: "Calcular cuántos días de vacaciones le corresponden al empleado en 3 años consecutivos, usando el dato de 28 días por año. Debe devolver el total de días de vacaciones acumulados en 3 años."
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[5] analista (intento 1): 28 * 3 = 85 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[6] validador ✘ analista RECHAZADO: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+      error: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+[7] supervisor decide → analista (llm)
+      razón: El investigador ya validó que el empleado con más de 10 años tiene derecho a 28 días de vacaciones. El analista debe recalcular el total para 3 años.
+      instrucción: "Calcular cuántos días de vacaciones suma un empleado con 28 días de vacaciones en 3 años consecutivos. Usar el valor 28 y multiplicar por 3. Devolver el resultado exacto. [REPARACIÓN] Tu salida anterior fue rechazada por el validador determinístico. Salida anterior: {"expresion":"28 * 3","resultado…"
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✘
+[8] analista (intento 2): 28 * 3 = 84 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[9] validador ✔ analista aprobado
+[10] supervisor decide → FINISH (llm)
+      razón: Todas las partes de la pregunta están respondidas, los datos provienen de hallazgos validados y los resultados son consistentes.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[11] sintesis: respuesta redactada
+Respuesta final: "Un empleado con más de 10 años de antigüedad en TechCorp tiene derecho a 28 días corridos de vacaciones por año (fuente: política_vacaciones.txt). En 3 años, el total de días de vacaciones que le corresponden es: 28 días/año * 3 años = 84 días. Advertencia: Este cálculo asume que el empleado mantiene el mismo ritmo de acumulación de vacaciones durante los 3 años."
+(COMPLETADO · 3 paso(s) de especialista · 11 nodos · 17.4 s · 10103 tokens)
+  ✔ estado_final == COMPLETADO
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ el validador rechazó un resultado del analista (fallos_validacion.analista == 1)
+  ✔ el supervisor reenvió el error específico (bucle de reparación)
+  ✔ el analista se invocó 2 veces y quedó aprobado
+  ✔ la respuesta final contiene 84
+
+=== E6 · Sin evidencia: cierre honesto, sin inventar ===
+Usuario: "¿Cuál es el valor del bono de desempeño por trimestre y cuánto suman dos bonos?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta el dato del valor del bono de desempeño por trimestre, que no está en la pregunta ni en hallazgos validados.
+      instrucción: "Buscar el valor del bono de desempeño por trimestre en las políticas internas de TechCorp y devolver el valor encontrado con fuente y cita textual."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): TimeoutError: 
+[3] validador ✘ investigador RECHAZADO: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError: 
+      error: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError:
+[4] supervisor decide → investigador (llm)
+      razón: Falta el dato del valor del bono de desempeño por trimestre, que no está en la pregunta ni en hallazgos validados.
+      instrucción: "Investiga el valor del bono de desempeño por trimestre en las políticas internas de TechCorp y devuelve el hallazgo con fuente y cita textual. [REPARACIÓN] Tu salida anterior fue rechazada por el validador determinístico. Salida anterior: (no hubo artefacto) Errores específicos: - [ERROR_ESPECIALIS…"
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[5] investigador (intento 2): TimeoutError: 
+[6] validador ✘ investigador RECHAZADO: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError: 
+      error: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError:
+[7] supervisor decide → investigador (llm)
+      razón: Falta el dato del valor del bono de desempeño por trimestre, que no está disponible en la pregunta ni en hallazgos previos.
+      instrucción: "Investiga el valor del bono de desempeño por trimestre en las políticas internas de TechCorp y devuelve el hallazgo con fuente y cita textual. [REPARACIÓN] Tu salida anterior fue rechazada por el validador determinístico. Salida anterior: (no hubo artefacto) Errores específicos: - [ERROR_ESPECIALIS…"
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[8] investigador (intento 3): TimeoutError: 
+[9] validador ✘ investigador RECHAZADO: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError: 
+      error: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError:
+[10] supervisor decide → ESCALAR (guardrail)
+      razón: La validación de 'investigador' sigue fallando tras 2 reparaciones.
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+      guardrail: VALIDACION_IRRESOLUBLE
+[11] revision_humana: respuesta redactada
+Respuesta final: "Esta consulta requiere revisión humana (motivo: VALIDACION_IRRESOLUBLE:investigador). No entrego un resultado definitivo porque no superó la validación automática. Errores sin resolver: - [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: TimeoutError:"
+(REQUIERE_REVISION_HUMANA · motivo: VALIDACION_IRRESOLUBLE:investigador · 3 paso(s) de especialista · 11 nodos · 186.0 s · 980042 tokens)
+  ✘ estado_final == INCOMPLETO — fue REQUIERE_REVISION_HUMANA
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ no se invocó al analista con datos inexistentes
+  ✔ la respuesta no inventa cifras
+
+=== E7 · Un especialista lanza una excepción y se recupera ===
+Usuario: "Un empleado lleva 12 años en TechCorp. Según la política de vacaciones, ¿cuántos días de vacaciones le corresponden por año y cuántos días suma en 3 años consecutivos manteniendo ese ritmo?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta el dato específico sobre los días de vacaciones que corresponden por año según la política de la empresa.
+      instrucción: "Buscar la política de vacaciones de TechCorp para determinar cuántos días de vacaciones le corresponden a un empleado por año. Devolver el número de días de vacaciones por año y la fuente de la información."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): ErrorInyectado: Falla simulada del especialista 'investigador'
+[3] validador ✘ investigador RECHAZADO: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: ErrorInyectado: Falla simulada del especialista 'investigador'
+      error: [ERROR_ESPECIALISTA] El investigador falló al ejecutarse: ErrorInyectado: Falla simulada del especialista 'investigador'
+[4] supervisor decide → investigador (llm)
+      razón: Falta el dato de cuántos días de vacaciones corresponden por año según la política de la empresa.
+      instrucción: "Investiga cuántos días de vacaciones le corresponden a un empleado de TechCorp por año según la política de vacaciones. Devuelve el número de días por año y la fuente de la información. [REPARACIÓN] Tu salida anterior fue rechazada por el validador determinístico. Salida anterior: (no hubo artefact…"
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[5] investigador (intento 2): estado=completo, 3 hallazgo(s), confianza=1.00
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones por año") → [Fuente: politica_teletrabajo.txt] Política de Teletrabajo - TechCorp El esquema estándar es de 3 días de trabajo remot…
+[6] validador ✔ investigador aprobado
+[7] supervisor decide → analista (llm)
+      razón: Faltan cálculos para determinar el total de días de vacaciones en 3 años.
+      instrucción: "Calcular cuántos días de vacaciones le corresponden al empleado en 3 años consecutivos, considerando que tiene más de 10 años de antigüedad y le corresponden 28 días de vacaciones por año. Usar el valor 28 días por año y multiplicar por 3 años."
+      rúbrica: completitud ✘ · respaldo ✔ · consistencia ✔
+[8] analista (intento 1): 28 * 3 = 84 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[9] validador ✔ analista aprobado
+[10] supervisor decide → FINISH (llm)
+      razón: Todas las partes de la pregunta están respondidas, los datos provienen de hallazgos validados y los resultados son consistentes.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✔
+[11] sintesis: respuesta redactada
+Respuesta final: "Un empleado con 12 años de antigüedad en TechCorp le corresponden 28 días corridos de vacaciones por año, según la política de vacaciones de la empresa. Si consideramos un periodo de 3 años, el cálculo es el siguiente: 28 días/año * 3 años = 84 días de vacaciones. Por lo tanto, en 3 años, el empleado suma un total de 84 días de vacaciones. Advertencia: Este cálculo asume que el empleado mantiene el mismo ritmo de antigüedad y no hay cambios en la política de vacaciones."
+(COMPLETADO · 3 paso(s) de especialista · 11 nodos · 14.5 s · 8449 tokens)
+  ✔ estado_final == COMPLETADO
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ el investigador falló con excepción en el primer intento
+  ✔ el validador la registró como ERROR_ESPECIALISTA y el sistema no se rompió
+  ✔ el investigador se recuperó en el segundo intento
+  ✔ la respuesta final contiene 84
+
+=== E8 · Validación irresoluble → revisión humana ===
+Usuario: "Un empleado lleva 12 años en TechCorp. Según la política de vacaciones, ¿cuántos días de vacaciones le corresponden por año y cuántos días suma en 3 años consecutivos manteniendo ese ritmo?"
+[1] supervisor decide → investigador (llm)
+      razón: Falta el dato de cuántos días de vacaciones le corresponden por año según la política de la empresa.
+      instrucción: "Buscar la política de vacaciones de TechCorp para determinar cuántos días de vacaciones le corresponden a un empleado por año. Devolver el número de días de vacaciones anuales y la fuente con cita textual."
+      rúbrica: completitud ✘ · respaldo ✘ · consistencia ✘
+[2] investigador (intento 1): estado=completo, 3 hallazgo(s), confianza=1.00
+      herramienta: buscar_en_politicas_internas(pregunta="días de vacaciones anuales") → [Fuente: politica_teletrabajo.txt] Política de Teletrabajo - TechCorp El esquema estándar es de 3 días de trabajo remot…
+[3] validador ✔ investigador aprobado
+[4] supervisor decide → analista (llm)
+      razón: Faltan cálculos para determinar el total de días de vacaciones en 3 años.
+      instrucción: "Calcular cuántos días de vacaciones le corresponden al empleado en 3 años consecutivos, considerando que tiene más de 10 años de antigüedad y le corresponden 28 días de vacaciones por año. Usar el valor 28 días por año y multiplicar por 3 años."
+      rúbrica: completitud ✘ · respaldo ✔ · consistencia ✔
+[5] analista (intento 1): 28 * 3 = 85 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[6] validador ✘ analista RECHAZADO: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+      error: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+[7] supervisor decide → analista (llm)
+      razón: El investigador ya validó los días de vacaciones correspondientes y ahora se necesita un cálculo correcto basado en esos datos.
+      instrucción: "Calcular cuántos días de vacaciones suma un empleado con 28 días por año en 3 años consecutivos. Usar el valor 28 para los días por año y multiplicar por 3. Devolver el resultado exacto. [REPARACIÓN] Tu salida anterior fue rechazada por el validador determinístico. Salida anterior: {"expresion":"28…"
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✘
+[8] analista (intento 2): 28 * 3 = 85 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[9] validador ✘ analista RECHAZADO: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+      error: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+[10] supervisor decide → analista (llm)
+      razón: El investigador ya validó que el empleado con más de 10 años tiene derecho a 28 días de vacaciones. El analista debe calcular correctamente el total para 3 años.
+      instrucción: "Calcular cuántos días de vacaciones suma un empleado con 28 días por año en 3 años consecutivos. Usar el valor 28 para los días por año y multiplicar por 3. Devolver el resultado exacto. [REPARACIÓN] Tu salida anterior fue rechazada por el validador determinístico. Salida anterior: {"expresion":"28…"
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✘
+[11] analista (intento 3): 28 * 3 = 85 (confianza=1.00)
+      herramienta: calculadora(expresion="28 * 3") → Resultado: 84
+[12] validador ✘ analista RECHAZADO: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+      error: [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora.
+[13] supervisor decide → ESCALAR (guardrail)
+      razón: La validación de 'analista' sigue fallando tras 2 reparaciones.
+      rúbrica: completitud ✔ · respaldo ✔ · consistencia ✘
+      guardrail: VALIDACION_IRRESOLUBLE
+[14] revision_humana: respuesta redactada
+Respuesta final: "Esta consulta requiere revisión humana (motivo: VALIDACION_IRRESOLUBLE:analista). No entrego un resultado definitivo porque no superó la validación automática. Errores sin resolver: - [RESULTADO_INCONSISTENTE] La expresión '28 * 3' da 84, pero reportaste resultado=85. Reportá exactamente el valor que devuelve la calculadora. Aportes que sí fueron validados: - [investigador] Los empleados con menos de 5 años de antigüedad acceden a 14 días corridos de vacaciones. (valor=14 días corridos por año) — fuente: politica_vacaciones.txt - [investigador] Los empleados con 5 a 10 años acceden a 21 días …"
+(REQUIERE_REVISION_HUMANA · motivo: VALIDACION_IRRESOLUBLE:analista · 4 paso(s) de especialista · 14 nodos · 19.4 s · 12842 tokens)
+  ✔ estado_final == REQUIERE_REVISION_HUMANA
+  ✔ el flujo termina en síntesis o revisión humana
+  ✔ termina en revision_humana (no en síntesis)
+  ✔ motivo VALIDACION_IRRESOLUBLE:analista
+  ✔ el analista agotó sus intentos (3) sin bucle infinito
+  ✔ la respuesta pide revisión humana y no presenta el cálculo rechazado como válido
+
+# resumen: {"escenarios": 8, "verificaciones_ok": 41, "verificaciones_total": 42, "tokens": 1034362, "duracion_s": 277.2}

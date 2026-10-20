@@ -1,0 +1,11 @@
+# Solo para RETRIEVER_BACKEND=pinecone (el RAG de la Pre-entrega 4 que reconecta el notebook).
+# NO fue probado en el sandbox donde se verificó este PRD (sin red ni claves): es la lista de imports de la celda 3 y 9 del notebook.
+langchain-community
+langchain-classic
+langchain-text-splitters
+langchain-huggingface
+langchain-pinecone
+pinecone
+sentence-transformers
+rank-bm25
+tiktoken
