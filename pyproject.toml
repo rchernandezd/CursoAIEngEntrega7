@@ -20,7 +20,7 @@ mypy_path = "."
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-module = ["langchain_google_genai.*", "langchain_pinecone.*", "langchain_huggingface.*", "langchain_classic.*", "langchain_community.*", "pinecone.*", "langchain_text_splitters.*"]
+module = ["langchain_google_genai.*", "langchain_pinecone.*", "langchain_huggingface.*", "langchain_classic.*", "langchain_community.*", "pinecone.*", "langchain_text_splitters.*", "playwright.*"]
 ignore_missing_imports = true
 
 [tool.ruff]
