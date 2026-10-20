@@ -1,0 +1,117 @@
+{
+  "resumen": {
+    "n": 5,
+    "tiempo_pared_s": 13.01,
+    "done": 5,
+    "failed": 0,
+    "sin_terminar": 0,
+    "latencia_total_p50_s": 13.0,
+    "latencia_total_p95_s": 13.0,
+    "latencia_total_media_s": 13.0,
+    "post_202_max_ms": 75.8,
+    "health_durante_la_carga_max_ms": 48.9,
+    "health_fallidos": 0
+  },
+  "jobs": [
+    {
+      "n": 1,
+      "job_id": "04e0e264-6e20-45d8-b3ca-7ad6b0c4660a",
+      "http_status": 202,
+      "aceptado_ms": 41.570300003513694,
+      "total_s": 13.004445999977179,
+      "estado": "DONE",
+      "pasos": [
+        "supervisor",
+        "investigador",
+        "validador",
+        "supervisor",
+        "analista",
+        "validador",
+        "supervisor",
+        "sintesis",
+        "evaluar_criticidad"
+      ],
+      "error": null
+    },
+    {
+      "n": 2,
+      "job_id": "4dfa1940-32ed-4758-b8b4-47d420098dfb",
+      "http_status": 202,
+      "aceptado_ms": 74.03309998335317,
+      "total_s": 12.992225900001358,
+      "estado": "DONE",
+      "pasos": [
+        "supervisor",
+        "investigador",
+        "validador",
+        "supervisor",
+        "analista",
+        "validador",
+        "supervisor",
+        "sintesis",
+        "evaluar_criticidad"
+      ],
+      "error": null
+    },
+    {
+      "n": 3,
+      "job_id": "49bee88b-b6ea-40e6-9f96-da772d8ccc9f",
+      "http_status": 202,
+      "aceptado_ms": 72.42499996209517,
+      "total_s": 13.0028522000066,
+      "estado": "DONE",
+      "pasos": [
+        "supervisor",
+        "investigador",
+        "validador",
+        "supervisor",
+        "analista",
+        "validador",
+        "supervisor",
+        "sintesis",
+        "evaluar_criticidad"
+      ],
+      "error": null
+    },
+    {
+      "n": 4,
+      "job_id": "158a95c2-7b1c-496c-af1e-a01c836146dd",
+      "http_status": 202,
+      "aceptado_ms": 72.63800001237541,
+      "total_s": 13.00056419998873,
+      "estado": "DONE",
+      "pasos": [
+        "supervisor",
+        "investigador",
+        "validador",
+        "supervisor",
+        "analista",
+        "validador",
+        "supervisor",
+        "sintesis",
+        "evaluar_criticidad"
+      ],
+      "error": null
+    },
+    {
+      "n": 5,
+      "job_id": "858f4d5b-5d9e-404c-85ab-96a256d2b9f6",
+      "http_status": 202,
+      "aceptado_ms": 75.83640003576875,
+      "total_s": 13.000501800037455,
+      "estado": "DONE",
+      "pasos": [
+        "supervisor",
+        "investigador",
+        "validador",
+        "supervisor",
+        "analista",
+        "validador",
+        "supervisor",
+        "sintesis",
+        "evaluar_criticidad"
+      ],
+      "error": null
+    }
+  ]
+}
