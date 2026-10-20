@@ -1,0 +1,16 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.git/
+.vscode/
+.claude/
+tests/
+screenshots/
+traces/
+logs/
+*.ipynb

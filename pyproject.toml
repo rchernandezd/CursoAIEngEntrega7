@@ -1,0 +1,36 @@
+[project]
+name = "orquestador-multiagente"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-p no:cacheprovider"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["state.py", "schemas.py", "config.py", "exceptions.py", "faults.py", "graph.py", "llm.py", "prompts.py", "validation.py", "tracing.py", "escenarios.py", "logging_config.py", "main.py", "demo.py", "agents", "tools", "app", "scripts"]
+exclude = ["scripts/build_notebook.py"]  # script del M6 (genera el notebook); nunca estuvo tipado
+mypy_path = "."
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["langchain_google_genai.*", "langchain_pinecone.*", "langchain_huggingface.*", "langchain_classic.*", "langchain_community.*", "pinecone.*", "langchain_text_splitters.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "ASYNC", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"prompts.py" = ["E501"]  # los prompts son texto largo a propósito
+"tests/**" = ["ASYNC109", "ASYNC110"]  # los tests esperan por polling a propósito (igual que lo haría un cliente real)

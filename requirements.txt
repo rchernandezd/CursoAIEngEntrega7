@@ -1,0 +1,16 @@
+# Instalación completa para desarrollo:  pip install -r requirements.txt
+-r requirements-api.txt
+# --- notebook de demo (Entrega 6) ---
+nbformat>=5.9
+nbconvert>=7.0
+ipykernel>=6.29
+# --- desarrollo y calidad ---
+pytest>=8.0
+pytest-asyncio>=0.24
+pytest-timeout>=2.3
+fakeredis>=2.26                          # Redis falso para los tests unitarios (sin servidor)
+httpx>=0.27                              # cliente HTTP: tests de la API y scripts/load_test.py
+mypy>=1.10
+ruff>=0.6
+# --- opcional: capturas de pantalla del dashboard (scripts/capturar_dashboard.py) ---
+# playwright>=1.45     (y luego:  playwright install chromium)
